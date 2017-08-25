@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 다른 mapper와 중복되지 않도록 네임스페이스 기재 -->
+<mapper namespace="board">
+
+	<insert id="addAttach">
+		insert into tbl_attach (fullName,bno) values( #{fullName},seq_board.currval)
+	</insert>
+	
+	<select id="listAll" resultType="com.javalec.tea_pjt.model.board.dto.BoardVo">
+		<include refid="paging_header"/>
+		select rownum,bno,title,content,b.regdate,viewcnt,user_name,show,
+		(select count(*) from tbl_reply where bno=b.bno) cnt 
+		from tbl_board b, tmember m 
+		<include refid="search"></include>
+		order by bno desc,regdate desc)
+		<include refid="paging_footer"></include>
+	</select>
+	
+	<insert id="insert">
+		insert into tbl_board(bno,title,content,writer,show)
+	values (seq_board.nextval,#{title},#{content},#{writer},'y')
+	</insert>
+	
+	<!-- <delete id="delete">
+		delete from tbl_board where bno=#{bno}
+	</delete>
+	 -->
+	<update id="delete">
+		update tbl_board
+		set show='n'
+		where bno=#{bno}
+	</update>
+	
+	<select id="view" resultType="com.javalec.tea_pjt.model.board.dto.BoardVo">
+		select bno,title,content,b.regdate,viewcnt,user_name,writer,show
+		from tbl_board b, tmember m
+		where b.writer=m.user_id and bno=#{bno}
+	</select>
+	
+	<update id="increaseCount">
+		update tbl_board
+		set viewcnt=viewcnt+1 where bno=#{bno}
+	</update>
+	
+	<update id="updateArticle">
+	update tbl_board set
+	title=#{title},content=#{content}
+	where bno=#{bno}
+	
+	</update>
+	
+	<select id="countArticle" resultType="int">
+		select count(*) from tbl_board b,tmember m
+		<include refid="search"/>
+	</select>
+	
+	<!-- sql code 조각(자주사용 되는 코드) -->
+	<sql id="search">
+		<choose>
+			<when test="search_option == 'all'">
+				where 
+				  b.writer=m.user_id 
+				and
+ 				( user_name like '%'||#{keyword}||'%'
+				 or content like '%'||#{keyword}||'%'
+   				 or title like '%'||#{keyword}||'%' )
+			</when>
+			<otherwise>
+			where b.writer=m.user_id and	
+				 ${search_option} like 
+					'%'||#{keyword}||'%'
+			</otherwise>
+		</choose>	
+	</sql>	 
+	
+	<sql id="paging_header">
+	select * from (select rownum as rn,A.*
+		from(
+	</sql>
+	
+	<sql id="paging_footer">
+		A
+		)where rn between #{start} and #{end}
+	</sql>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

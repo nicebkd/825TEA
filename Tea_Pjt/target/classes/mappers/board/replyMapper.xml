@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 다른 mapper와 중복되지 않도록 네임스페이스 기재 -->
+<mapper namespace="reply">
+
+	
+	<delete id="delete">
+	delete from tbl_reply
+	where rno=#{rno}	
+	</delete>
+
+	<update id="update">
+	update tbl_reply
+	 set replytext =#{replytext}
+	where rno =#{rno} 	
+	</update>
+	
+	<select id="detail" resultType="com.javalec.tea_pjt.model.board.dto.ReplyVo">
+	select * from tbl_reply
+	where rno=#{rno}
+	</select>
+
+	<insert id="insertReply">
+		insert into tbl_reply(rno,bno,replytext,replyer,secret_reply)
+		values (reply_seq.nextval,#{bno},#{replytext},#{replyer},#{secret_reply})
+	</insert>
+
+	<select id="listReply" resultType="com.javalec.tea_pjt.model.board.dto.ReplyVo">
+	<include refid="paging_header"/>
+		select rno,bno,replytext,replyer,user_name
+		,r.regdate,r.updatedate,secret_reply,
+		(select writer from tbl_board where bno=r.bno)writer
+		from tbl_reply r,tmember m
+		where r.replyer =m.user_id and bno=#{bno}
+		order by rno)
+		<include refid="paging_footer"/>
+	</select>
+	
+	<select id="count" resultType="int">
+		select count(*) from tbl_reply where bno=#{bno}
+	</select>
+	
+	
+
+	<sql id="paging_header">
+		select * from (select rownum as rn,A.*
+		from(
+	</sql>
+
+	<sql id="paging_footer">
+		A
+		)where rn between #{start} and #{end}
+	</sql>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 다른 mapper와 중복되지 않도록 네임스페이스 기재 -->
+<mapper namespace="attendance">
+	<insert id="insert">
+		insert into attendance values(#{user_id}, sysdate, to_char(sysdate, 'yyyy'), to_char(sysdate, 'mm'), to_char(sysdate, 'dd'))
+	</insert>
+	<select id="userAllAttendance" resultType="com.javalec.tea_pjt.model.attendance.dto.AttendanceDTO">
+		select * from attendance where user_id=#{user_id}
+	</select>
+	<select id="monthAttendance" resultType="com.javalec.tea_pjt.model.attendance.dto.AttendanceDTO">
+		select * from attendance where user_id=#{user_id} and atYear=#{atYear} and atMonth=#{atMonth}
+	</select>
+	<select id="monthCount" resultType="int">
+		select count(*) from attendance where user_id=#{user_id} and atYear=#{atYear} and atMonth=#{atMonth}
+	</select>
+	<select id="userCount" resultType="int">
+		select count(*) from attendance where user_id=#{user_id}
+	</select>
+	<select id="allCount" resultType="int">
+		select count(*) from attendance
+	</select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
